@@ -6,7 +6,7 @@ const {getColor,createColor,toggleColor,updateColor,deleteColor,deleteAll}=requi
 
 
 ColorRouter.get("/",getColor);
-ColorRouter.post("/create",createColor);
+ColorRouter.post("/create",AuthAdmin([0,1]),createColor);
 ColorRouter.patch("/toggle/:id",toggleColor);
 ColorRouter.delete("/delete/:id",AuthAdmin([0]),deleteColor);
 ColorRouter.put("update/:id",AuthAdmin([0,1]),updateColor);

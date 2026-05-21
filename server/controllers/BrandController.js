@@ -44,7 +44,7 @@ const getBrands = async (req, res) => {
 
         const brands = await BrandModel.find(filter).sort({ createdAt: -1 }).populate({
             path: "category_ids",
-            select: "name,slug",
+            select: "name slug"
         });
 
         res.send({

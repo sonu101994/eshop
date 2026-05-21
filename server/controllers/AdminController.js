@@ -32,7 +32,9 @@ const register = async (req, res) => {
         return res.send(message.general_success("registered successfully"));
 
     } catch (error) {
+         console.log(error);
         return res.send(message.catch_error);
+       
     }
 };
 
@@ -71,7 +73,7 @@ const login = async (req, res) => {
             flag: 1,
             msg: "Login successful",
             token,
-            data: {
+            admin: {
                 id: admin._id,
                 name: admin.name,
                 email: admin.email,

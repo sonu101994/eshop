@@ -1,55 +1,55 @@
 "use client";
 
-import { logoutAdmin,lsToAdmin } from "@/redux/reducers/AdminReducers";
+import { logoutAdmin, lsToAdmin } from "@/redux/reducers/AdminReducers";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect,useState } from "react";
-import { useDispatch,useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useSidebar } from "./SideBarContext";
 
-export default function Header(){
+export default function Header() {
     // dispatcher for actions
-    const dispatcher=useDispatch();
+    const dispatcher = useDispatch();
 
     // dropdown menu show and hide
-    const [isProfileOpen,setIsProfileOpen]=useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     // navigation handler
-    const router=useRouter();
+    const router = useRouter();
 
     // current admin state from redux store
-    const admin=useSelector((state)=>state.admin);
-
+    const admin = useSelector((state) => state.admin);
+    const [isChecking,setIsChecking]=useState(true);
     // redirect to login
-    const logoutHandler=()=>{
+    const logoutHandler = () => {
         dispatcher(logoutAdmin());
         router.push("/admin/login");;
     }
 
-    useEffect(()=>{
-        const lsAdmin=localStorage.getItem("admin");
-        const lsToken=localStorage.getItem("admin_token");
+    useEffect(() => {
+        dispatcher(lsToAdmin());
+         setIsChecking(false);
+    }, []);
 
-        if(lsAdmin==null&&lsToken==null){
+    useEffect(() => {
+       if (!isChecking) {
+        if (!admin.data && !admin.token) {
             router.push("/admin/login");
-        }else{
-             dispatcher(lsToAdmin());
         }
-           
-        
-    },[]);
+    }
+    }, [isChecking,admin.data, admin.token]);
 
     // sidebar state
-    const {isOpen }=useSidebar();
+    const { isOpen } = useSidebar();
 
-    return(
-          <header
+    return (
+        <header
             className={`fixed top-0 right-0 h-16 bg-white border-b border-gray-200 z-40 transition-all duration-300
             ${isOpen ? "lg:left-64" : "lg:left-20"}
             left-0`}
 
         >
-             <div className="h-full px-3 sm:px-4 lg:px-6">
+            <div className="h-full px-3 sm:px-4 lg:px-6">
 
                 <div className="flex items-center justify-between h-full gap-3">
 
@@ -74,7 +74,7 @@ export default function Header(){
                                 <input
                                     type="text"
                                     placeholder="Search here..."
-                                    className="w-48 lg:w-72 pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-48 lg:w-72 pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 text-gray-700 focus:ring-blue-500 focus:border-blue-500 transition"
                                 />
 
                                 {/* search icon */}

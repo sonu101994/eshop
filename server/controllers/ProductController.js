@@ -263,7 +263,7 @@ const getProducts = async (req, res) => {
 const addOtherImages = async (req, res) => {
 
     try {
-
+        console.log("api hit");
         const { product_id } = req.params;
 
         const files = req.files?.other_images;

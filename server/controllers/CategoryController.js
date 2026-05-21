@@ -59,7 +59,7 @@ const getCategories = async (req, res) => {
                 count: Array.isArray(categories) && categories.length,
                 flag: 1, //success
                 categories,
-                image_path: "/images/category/",
+                image_path: "/images/categories/",
             }
         )
     } catch (error) {
@@ -184,9 +184,9 @@ const updateCategory = async (req, res) => {
 
         if (image) {
             const imageName = generateRandomNames(image.name);
-            const destination = "./public/images/category/" + imageName
+            const destination = "./public/images/categories/" + imageName
             await image.mv(destination);
-            await fs.unlinkSync(`./public/images/category/${category.image_name}`);
+            await fs.unlinkSync(`./public/images/categories/${category.image_name}`);
             category.image_name = imageName;
         }
         category.name = name;
