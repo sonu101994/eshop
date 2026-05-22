@@ -139,3 +139,61 @@ export const getProduct=async (query_object={})=>{
         }
     }
 }
+
+
+export const getAdmins=async()=>{
+    try {
+        const response=await apiClient.get(
+            "/admin/all",
+            getAuthHeader()
+        );
+
+        if (response.data.flag===1) {
+            return {
+                admins:response.data.admins||[],
+            }
+        }else{
+             return {
+            admins: [],
+        };
+        }
+    } catch (error) {
+        
+        console.log(error);
+
+        return {
+            admins: [],
+        };
+    }
+}
+
+// get all orders (admin)
+export const getOrders=async ()=>{
+    console.log("hitting");
+    try {
+        const response=await apiClient.get(
+            "/order/admin/all",
+            getAuthHeader()
+        );
+        console.log("response",response.data)
+        if(response.data.flag==1){
+            console.log("receiving");
+            console.log("orders",response.data.orders);
+            return {
+                orders:response.data.orders||[],
+            };
+        }else{
+             return {
+            orders:[],
+        }
+        }
+
+       
+    } catch (error) {
+
+        console.log(error);
+         return {
+            orders:[],
+        }
+    }
+}

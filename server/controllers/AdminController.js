@@ -1,7 +1,7 @@
-const AdminModel=require("../models/AdminModel");
+const AdminModel = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
-const jwt=require("jsonwebtoken");
-const {message}=require("../library/helper");
+const jwt = require("jsonwebtoken");
+const { message } = require("../library/helper");
 
 // register admin users
 const register = async (req, res) => {
@@ -12,7 +12,7 @@ const register = async (req, res) => {
         if (!name || !email || !password || role == undefined) {
             return res.send(message.general_error("all fields required"));
         }
-        
+
 
         const adminExists = await AdminModel.findOne({ email });
 
@@ -32,9 +32,9 @@ const register = async (req, res) => {
         return res.send(message.general_success("registered successfully"));
 
     } catch (error) {
-         console.log(error);
+        console.log(error);
         return res.send(message.catch_error);
-       
+
     }
 };
 
@@ -86,5 +86,148 @@ const login = async (req, res) => {
     }
 };
 
+const getAllAdmins = async (req, res) => {
+    try {
+        
+        if (req.admin.role !== 0) {
+            return res.send({ flag: 0, msg: "Access denied" });
+        }
 
-module.exports = { register, login};
+        const admins = await AdminModel.find().select("-password").sort({ createdAt: -1 });
+
+        return res.send(
+            {
+                flag: 1,
+                admins
+            }
+        )
+    } catch (error) {
+        return res.send({ flag: 0, msg: "Error fetching admins" });
+    }
+}
+
+const updateAdminStatus = async (req, res) => {
+    try {
+        console.log("api hitting");
+        const { id } = req.params;
+        if (req.admin.role !== 0) {
+            return res.send({ flag: 0, msg: "Access denied" });
+        }
+
+        const admin = await AdminModel.findById(id);
+        if (!admin) {
+            return res.send({ flag: 0, msg: "admin not found" });
+        }
+        if (admin.role==0) {
+            return res.send({
+                flag:0,
+                msg:"super admin can not be inactive"
+            });
+        }
+        console.log(admin.status);
+
+        admin.status = !admin.status;
+        await admin.save();
+
+        return res.send(
+            {
+                flag: 1,
+                msg: "status updated",
+                status: admin.status,
+            }
+        )
+    } catch (error) {
+        return res.send({ flag: 0, msg: "Error updating status" });
+    }
+}
+
+// get single admin
+const getAdminById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(id);
+        const admin = await AdminModel.findById(id).select("-password");
+
+        if (!admin) {
+            return res.send({ flag: 0, msg: "Admin not found" });
+        }
+        return res.send({
+            flag: 1,
+            admin
+        })
+    } catch (error) {
+        return res.send({ flag: 0, msg: "Error fetching admin" });
+    }
+}
+
+const updateAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, role, status } = req.body;
+        const admin = await AdminModel.findById(id);
+
+        if (!admin) {
+            return res.send({ flag: 0, msg: "Admin not found" });
+        }
+
+        admin.name = name ?? admin.name;
+        admin.role = role ?? admin.role;
+        admin.status = status ?? admin.status;
+
+        await admin.save();
+
+        return res.send({
+            flag: 1,
+            msg: "Admin updated successfully"
+        });
+    } catch (error) {
+        return res.send({ flag: 0, msg: "Server error" });
+    }
+}
+
+const getAdminProfile = async (req, res) => {
+    try {
+        const admin = await AdminModel.findById(req.admin._id).select("-password");
+        return res.send({
+            flag: 1,
+            admin
+        });
+    } catch (error) {
+        return res.send({ flag: 0, msg: "Error fetching profile" });
+    }
+}
+
+const changePassword = async (req, res) => {
+    try {
+        console.log("hitting");
+        const { oldPassword, newPassword } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.send({ flag: 0, msg: "All fields required" });
+        }
+
+        const admin = await AdminModel.findById(req.admin._id);
+        const isMatch = await bcrypt.compare(oldPassword, admin.password);
+        if (!isMatch) {
+            return res.send({ flag: 0, msg: "Old password is incorrect" });
+        }
+
+        const hashed = await bcrypt.hash(newPassword, 10);
+        admin.password = hashed;
+        await admin.save();
+        return res.send({
+            flag: 1,
+            msg: "password updated successfully"
+        });
+
+
+    } catch (error) {
+
+        return res.send({ flag: 0, msg: "Server error" });
+
+    }
+}
+
+
+
+
+module.exports = { register, login,getAdminById,getAdminProfile,getAllAdmins,updateAdmin,updateAdminStatus,changePassword };

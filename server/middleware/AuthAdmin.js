@@ -29,6 +29,7 @@ const AuthAdmin=(roles=[])=>{
                 next();
 
         } catch (error) {
+            console.log(error);
               return res.send({ flag: 0, msg: "Token invalid or expired" });
         }
     }

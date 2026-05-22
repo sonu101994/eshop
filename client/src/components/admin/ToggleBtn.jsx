@@ -22,10 +22,14 @@ export default function ToggleBtn({
     // toggle status handler
 
     const toggleHandler = async () => {
+
         try {
+
+            console.log(base_url,id);
             const response = await apiClient.patch(
                 flag ? `${base_url}/${id}/${flag}` : `${base_url}/${id}`,{},getAuthHeader()
             );
+            console.log(response.data)
 
             if (response.data.flag == 1) {
                 toast.success(response.data.msg);
@@ -35,7 +39,7 @@ export default function ToggleBtn({
                 toast.warning(response.data.msg);
             }
         } catch (error) {
-            console.log("error", error);
+            console.log("error", error.message);
             toast.error("Something went wrong!");
         }
     }

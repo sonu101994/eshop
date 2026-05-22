@@ -10,8 +10,10 @@ const CategoryRouter=require("./routers/CategoryRouter");
 const BrandRouter=require("./routers/BrandRouter");
 const ColorRouter=require("./routers/ColorRouter");
 const ProductRouter=require("./routers/ProductRouter");
-
-
+const UserRouter=require("./routers/UserRouter");
+const UserManagementRouter=require("./routers/UserManagementRouter");
+const OrderRouter=require("./routers/OrderRouter");
+const DashBoardRouter = require("./routers/DashBoardRouter");
 
 app.use(express.json({ limit: "10mb" })); //parser
 app.use(express.urlencoded({ extended: true }));
@@ -50,5 +52,12 @@ app.use("/api/category",CategoryRouter);
 app.use("/api/brand",BrandRouter);
 app.use("/api/color",ColorRouter);
 app.use("/api/product",ProductRouter);
+app.use("/api/user",UserRouter);
+app.use("/api/admin/users",UserManagementRouter);
+app.use("/api/order",OrderRouter);
+app.use("/api/dashboard",DashBoardRouter);
+
+
+
 
 module.exports = app;
