@@ -38,16 +38,12 @@ app.use(cors(
     }
 ));
 
-
 // testing api
-
 app.get("/", (req, res) => {
-    res.status(200).json(
-        {
-            success: true,
-            message: "API running successfully"
-        }
-    );
+    res.json({
+        success: true,
+        message: "API running successfully",
+    });
 });
 
 
