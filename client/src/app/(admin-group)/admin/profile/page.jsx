@@ -8,55 +8,37 @@ export default function AdminProfilePage() {
     const [admin, setAdmin] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-
-    const [passwords, setPasswords] = useState(
-        {
-            oldPassword: "",
-            newPassword: ""
-        }
-    );
+    const [passwords, setPasswords] = useState({ oldPassword: "", newPassword: "" });
 
     // get profile
-
-    const fetchProfile =async ()=>{
+    const fetchProfile = async () => {
         try {
-            const response=await apiClient.get(
-                "/admin/profile",
-                getAuthHeader()
-            );
-
-            if (response.data.flag===1) {
+            const response = await apiClient.get("/admin/profile", getAuthHeader());
+            if (response.data.flag === 1) {
                 setAdmin(response.data.admin);
-            }else{
+            } else {
                 toast.error(response.data.msg);
             }
         } catch (error) {
             toast.error("failed to load profile");
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     };
-    useEffect(()=>{
+
+    useEffect(() => {
         fetchProfile();
-    },[]);
+    }, []);
 
     // change password
-
-    const changePassword=async ()=>{
+    const changePassword = async () => {
         try {
-            console.log("hitting");
-            const response=await apiClient.put(
-                "/admin/change-password",
-                passwords,
-                getAuthHeader()
-            );
-            console.log(response.data);
-            if (response.data.flag==1) {
+            const response = await apiClient.put("/admin/change-password", passwords, getAuthHeader());
+            if (response.data.flag == 1) {
                 toast.success(response.data.msg);
                 setShowModal(false);
-                setPasswords({ oldPassword:"",newPassword:""});
-            }else{
+                setPasswords({ oldPassword: "", newPassword: "" });
+            } else {
                 toast.error(response.data.msg);
             }
         } catch (error) {
@@ -65,139 +47,81 @@ export default function AdminProfilePage() {
         }
     };
 
-
-     if (loading) {
-        return (
-            <div className="p-6 text-center">
-                Loading profile...
-            </div>
-        );
+    if (loading) {
+        return <div className="admin-panel-card p-8 text-center text-slate-500">Loading profile...</div>;
     }
-      return (
-        <div className="min-h-screen bg-gray-100 p-6 text-gray-700">
 
-            {/* profile card */}
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+    return (
+        <div className="admin-page space-y-6">
+            <div className="admin-page-header">
+                <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Account</p>
+                    <h1 className="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Admin Profile</h1>
+                    <p className="mt-1 text-sm text-slate-500">View your admin account details and update password.</p>
+                </div>
+                <button type="button" onClick={() => setShowModal(true)} className="admin-primary-btn w-full sm:w-auto">Change Password</button>
+            </div>
 
-                <h1 className="text-2xl font-bold mb-6">
-                    Admin Profile
-                </h1>
-
-                <div className="space-y-5">
-
-                    <div>
-                        <p className="text-gray-500 text-sm">Name</p>
-                        <p className="text-lg font-semibold">{admin?.name}</p>
+            <div className="admin-panel-card max-w-4xl p-5 sm:p-6">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                    <div className="grid h-20 w-20 place-items-center rounded-3xl bg-slate-950 text-2xl font-bold text-white">
+                        {(admin?.name || "A").charAt(0).toUpperCase()}
                     </div>
-
                     <div>
-                        <p className="text-gray-500 text-sm">Email</p>
-                        <p className="text-lg font-semibold">{admin?.email}</p>
+                        <h2 className="text-2xl font-bold text-slate-950">{admin?.name}</h2>
+                        <p className="mt-1 text-sm text-slate-500">{admin?.email}</p>
                     </div>
-
-                    <div>
-                        <p className="text-gray-500 text-sm">Role</p>
-                        <p className="text-lg font-semibold">
-                            {admin?.role === 0
-                                ? "Super Admin"
-                                : admin?.role === 1
-                                    ? "Admin"
-                                    : "Manager"}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="text-gray-500 text-sm">Status</p>
-                        <p className={`text-lg font-semibold ${admin?.status ? "text-green-600" : "text-red-500"}`}>
-                            {admin?.status ? "Active" : "Inactive"}
-                        </p>
-                    </div>
-
                 </div>
 
-                {/* button to trigger modal*/}
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="mt-6 bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800"
-                >
-                    Change Password
-                </button>
-
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                    <div className="admin-soft-card p-4">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Role</p>
+                        <p className="mt-2 font-bold text-slate-950">{admin?.role === 0 ? "Super Admin" : admin?.role === 1 ? "Admin" : "Manager"}</p>
+                    </div>
+                    <div className="admin-soft-card p-4">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Status</p>
+                        <span className={`mt-2 admin-status-pill ${admin?.status ? "admin-status-pill-dark" : ""}`}>{admin?.status ? "Active" : "Inactive"}</span>
+                    </div>
+                    <div className="admin-soft-card p-4">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Access</p>
+                        <p className="mt-2 font-bold text-slate-950">Admin panel</p>
+                    </div>
+                </div>
             </div>
 
-            {/* modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <button type="button" aria-label="Close modal" onClick={() => setShowModal(false)} className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" />
+                    <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                        <h2 className="text-xl font-bold text-slate-950">Change Password</h2>
+                        <p className="mt-1 text-sm text-slate-500">Enter old and new password.</p>
 
-                    {/* BACKDROP */}
-                    <div
-                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                    
-                    ></div>
-
-                    {/* modal box */}
-                    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 z-10">
-
-                        <h2 className="text-xl font-bold text-center mb-5">
-                            Change Password
-                        </h2>
-
-                        <div className="space-y-4">
-
+                        <div className="mt-5 space-y-4">
                             <input
                                 type="password"
                                 placeholder="Enter Old Password"
                                 value={passwords.oldPassword}
-                                // defaultValue=""
-                                onChange={(e) =>
-                                    setPasswords({
-                                        ...passwords,
-                                        oldPassword: e.target.value
-                                    })
-                                }
+                                onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
                                 autoComplete="off"
-                                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                className="admin-form-input"
                             />
-
                             <input
                                 type="password"
                                 placeholder="Enter New Password"
                                 value={passwords.newPassword}
-                                onChange={(e) =>
-                                    setPasswords({
-                                        ...passwords,
-                                        newPassword: e.target.value
-                                    })
-                                }
+                                onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                                 autoComplete="off"
-                                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                className="admin-form-input"
                             />
-
                         </div>
 
-                        <div className="flex justify-end gap-3 mt-6">
-
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="px-4 py-2 border rounded-lg hover:bg-gray-100"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={changePassword}
-                                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
-                            >
-                                Update
-                            </button>
-
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <button type="button" onClick={() => setShowModal(false)} className="admin-secondary-btn">Cancel</button>
+                            <button type="button" onClick={changePassword} className="admin-primary-btn">Update</button>
                         </div>
-
                     </div>
                 </div>
             )}
-
         </div>
     );
-
 }

@@ -86,6 +86,7 @@ const login = async (req, res) => {
     }
 };
 
+// getting all admins
 const getAllAdmins = async (req, res) => {
     try {
         
@@ -105,10 +106,10 @@ const getAllAdmins = async (req, res) => {
         return res.send({ flag: 0, msg: "Error fetching admins" });
     }
 }
-
+// updating admin status
 const updateAdminStatus = async (req, res) => {
     try {
-        console.log("api hitting");
+        // console.log("api hitting");
         const { id } = req.params;
         if (req.admin.role !== 0) {
             return res.send({ flag: 0, msg: "Access denied" });
@@ -160,6 +161,7 @@ const getAdminById = async (req, res) => {
     }
 }
 
+// updating admin
 const updateAdmin = async (req, res) => {
     try {
         const { id } = req.params;
@@ -185,6 +187,7 @@ const updateAdmin = async (req, res) => {
     }
 }
 
+// getting admin profile bt req.admin
 const getAdminProfile = async (req, res) => {
     try {
         const admin = await AdminModel.findById(req.admin._id).select("-password");
@@ -196,7 +199,7 @@ const getAdminProfile = async (req, res) => {
         return res.send({ flag: 0, msg: "Error fetching profile" });
     }
 }
-
+// changing password
 const changePassword = async (req, res) => {
     try {
         console.log("hitting");

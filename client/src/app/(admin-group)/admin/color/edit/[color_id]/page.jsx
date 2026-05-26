@@ -89,10 +89,10 @@ export default function EditColorPage() {
   }
 
   return (
-    <div className="space-y-6 mt-4 px-3 sm:px-5 lg:px-0">
+    <div className="admin-page space-y-6">
 
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="admin-page-header">
 
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -113,7 +113,7 @@ export default function EditColorPage() {
       </div>
 
       {/* FORM CARD */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div className="admin-panel-card p-4 sm:p-6">
 
         <form onSubmit={submitHandler} className="space-y-6">
 
@@ -128,7 +128,7 @@ export default function EditColorPage() {
               value={form.name}
               onChange={nameChangeHandler}
               placeholder="e.g., Red, Blue, Green"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
             />
           </div>
 
@@ -183,7 +183,7 @@ export default function EditColorPage() {
 
             <button
               type="submit"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-black px-6 py-2.5 text-white hover:bg-gray-800"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-6 py-2.5 text-white hover:bg-slate-800"
             >
               Update Color
             </button>

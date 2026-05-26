@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
+
+// admin login page
 export default function AdminLoginPage() {
     const router = useRouter();
     const dispatcher = useDispatch();

@@ -1,20 +1,16 @@
-const { generateRandomNames,message } = require("../library/helper");
+const { generateRandomNames, message } = require("../library/helper");
 const ProductModel = require("../models/ProductModel");
 const fs = require("fs");
 const path = require("path");
-
 
 // create product
 const createProduct = async (req, res) => {
     try {
         const data = req.body;
-
         const image = req.files?.image;
 
         if (!image) {
-            return res.send(
-                message.general_error("main image is required")
-            );
+            return res.send(message.general_error("main image is required"));
         }
 
         const exists = await ProductModel.findOne({
@@ -26,9 +22,7 @@ const createProduct = async (req, res) => {
         });
 
         if (exists) {
-            return res.send(
-                message.general_error("product already exists")
-            );
+            return res.send(message.general_error("product already exists"));
         }
 
         const imageName = generateRandomNames(image.name);
@@ -45,30 +39,19 @@ const createProduct = async (req, res) => {
             sku_id: data.sku_id,
             name: data.name,
             slug: data.slug,
-
             original_price: Number(data.original_price),
-
             discounted_price: Number(data.discounted_price),
-
-            discount_percentage: Number(
-                data.discount_percentage || 0
-            ),
-
+            discount_percentage: Number(data.discount_percentage || 0),
             description: data.description,
-            short_description:
-                data.short_description || "",
-
+            short_description: data.short_description || "",
             image_name: imageName,
             stock: Number(data.stock || 0),
 
-            color_ids: data.color_ids
-                ? JSON.parse(data.color_ids)
-                : [],
-
+            color_ids: data.color_ids ? JSON.parse(data.color_ids) : [],
             brand_id: data.brand_id || null,
+
             is_hot: data.is_hot || false,
-            is_featured:
-                data.is_featured || false,
+            is_featured: data.is_featured || false,
             is_best: data.is_best || false,
             is_top: data.is_top || false,
             on_home: data.on_home || false,
@@ -77,22 +60,20 @@ const createProduct = async (req, res) => {
         res.send(message.created_msg("product"));
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
 };
 
 
-// get products
+// =========================
+// GET PRODUCTS (UPDATED)
+// =========================
 const getProducts = async (req, res) => {
 
     try {
 
         const query = req.query;
-
         const filter = {};
 
         if (query.id) {
@@ -127,19 +108,41 @@ const getProducts = async (req, res) => {
             filter.on_home = query.on_home === "true";
         }
 
+        // BRAND + CATEGORY FILTER
+        // Products are connected to categories through Brand.category_ids.
+        // If both brand and category are selected, use their intersection.
+        let brandIds = query.brand_id
+            ? String(query.brand_id).split(",").filter(Boolean)
+            : [];
 
-        if (query.brand_id) {
-            filter.brand_id =
-                query.brand_id;
+        if (query.category_id) {
+            const BrandModel = require("../models/BrandModel");
+            const categoryIds = String(query.category_id).split(",").filter(Boolean);
+
+            const brands = await BrandModel.find({
+                category_ids: { $in: categoryIds },
+            }).select("_id");
+
+            const categoryBrandIds = brands.map((b) => String(b._id));
+
+            brandIds = brandIds.length
+                ? brandIds.filter((id) => categoryBrandIds.includes(String(id)))
+                : categoryBrandIds;
         }
 
+        if (brandIds.length || query.category_id) {
+            filter.brand_id = { $in: brandIds };
+        }
 
+        // =========================
+        // ✅ COLOR FILTER (MULTI SAFE)
+        // =========================
         if (query.color_id) {
-            filter.color_ids = {
-                $in: [query.color_id],
-            };
+            const colorIds = String(query.color_id).split(",");
+            filter.color_ids = { $in: colorIds };
         }
 
+        // SEARCH
         if (query.search) {
             filter.$or = [
                 {
@@ -157,71 +160,63 @@ const getProducts = async (req, res) => {
             ];
         }
 
-        if (
-            query.min_price ||
-            query.max_price
-        ) {
+        // PRICE FILTER
+        if (query.min_price || query.max_price) {
 
             filter.discounted_price = {};
 
             if (query.min_price) {
-                filter.discounted_price.$gte =
-                    Number(query.min_price);
+                filter.discounted_price.$gte = Number(query.min_price);
             }
 
             if (query.max_price) {
-                filter.discounted_price.$lte =
-                    Number(query.max_price);
+                filter.discounted_price.$lte = Number(query.max_price);
             }
         }
 
         const page = Number(query.page || 1);
-
         const limit = Number(query.limit || 12);
-
         const skip = (page - 1) * limit;
-        let sort = {
-            createdAt: -1,
-        };
+
+        let sort = { createdAt: -1 };
 
         switch (query.sort) {
 
             case "price_low":
-                sort = {
-                    discounted_price: 1,
-                };
+                sort = { discounted_price: 1 };
                 break;
 
             case "price_high":
-                sort = {
-                    discounted_price: -1,
-                };
+                sort = { discounted_price: -1 };
                 break;
 
             case "oldest":
-                sort = {
-                    createdAt: 1,
-                };
+                sort = { createdAt: 1 };
                 break;
 
             case "name_asc":
-                sort = {
-                    name: 1,
-                };
+                sort = { name: 1 };
+                break;
+
+            case "popular":
+                sort = { total_sales: -1, createdAt: -1 };
+                break;
+
+            case "rating":
+                sort = { rating: -1, total_reviews: -1 };
+                break;
+
+            case "discount":
+                sort = { discount_percentage: -1, createdAt: -1 };
                 break;
 
             default:
-                sort = {
-                    createdAt: -1,
-                };
+                sort = { createdAt: -1 };
         }
-        const total = await ProductModel.countDocuments(
-            filter
-        );
 
-        const products = await ProductModel.find(
-            filter
-        )
+        const total = await ProductModel.countDocuments(filter);
+
+        const products = await ProductModel.find(filter)
             .sort(sort)
             .skip(skip)
             .limit(limit)
@@ -233,10 +228,7 @@ const getProducts = async (req, res) => {
                     select: "name slug",
                 },
             })
-            .populate(
-                "color_ids",
-                "name code"
-            );
+            .populate("color_ids", "name color_code");
 
         res.send({
             flag: 1,
@@ -244,42 +236,31 @@ const getProducts = async (req, res) => {
             page,
             limit,
             products,
-            image_path:
-                "/images/products/",
+            image_path: "/images/products/main_images/",
+            other_image_path: "/images/products/other_images/",
         });
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 
 // add other images
 const addOtherImages = async (req, res) => {
-
     try {
-        console.log("api hit");
         const { product_id } = req.params;
-
         const files = req.files?.other_images;
 
         if (!files) {
-            return res.send(
-                message.general_error("images are required")
-            );
+            return res.send(message.general_error("images are required"));
         }
 
         const product = await ProductModel.findById(product_id);
 
         if (!product) {
-            return res.send(
-                message.general_error("product not found")
-            );
+            return res.send(message.general_error("product not found"));
         }
 
         let images = product.other_images || [];
@@ -297,23 +278,17 @@ const addOtherImages = async (req, res) => {
             await file.mv(destination);
 
             images.push(name);
-
         };
 
         if (Array.isArray(files)) {
-
             for (let file of files) {
                 await saveFile(file);
             }
-
         } else {
-
             await saveFile(files);
-
         }
 
         product.other_images = images;
-
         await product.save();
 
         res.send({
@@ -323,13 +298,9 @@ const addOtherImages = async (req, res) => {
         });
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 
@@ -343,12 +314,9 @@ const deleteProduct = async (req, res) => {
         const product = await ProductModel.findById(id);
 
         if (!product) {
-            return res.send(
-                message.general_error("product not found")
-            );
+            return res.send(message.general_error("product not found"));
         }
 
-        // delete main image
         const filePath = path.join(
             __dirname,
             "../public/images/products/main_images/",
@@ -359,7 +327,6 @@ const deleteProduct = async (req, res) => {
             fs.unlinkSync(filePath);
         }
 
-        // delete other images
         if (product.other_images?.length > 0) {
 
             for (let img of product.other_images) {
@@ -373,9 +340,7 @@ const deleteProduct = async (req, res) => {
                 if (fs.existsSync(otherPath)) {
                     fs.unlinkSync(otherPath);
                 }
-
             }
-
         }
 
         await ProductModel.findByIdAndDelete(id);
@@ -383,13 +348,9 @@ const deleteProduct = async (req, res) => {
         res.send(message.delete_msg("product"));
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 
@@ -403,9 +364,7 @@ const toggleProduct = async (req, res) => {
         const product = await ProductModel.findById(id);
 
         if (!product) {
-            return res.send(
-                message.general_error("product not found")
-            );
+            return res.send(message.general_error("product not found"));
         }
 
         const map = {
@@ -420,27 +379,18 @@ const toggleProduct = async (req, res) => {
         const field = map[flag];
 
         if (!field) {
-            return res.send(
-                message.general_error("invalid flag")
-            );
+            return res.send(message.general_error("invalid flag"));
         }
 
         product[field] = !product[field];
-
         await product.save();
 
-        res.send(
-            message.general_success("toggled successfully")
-        );
+        res.send(message.general_success("toggled successfully"));
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 
@@ -454,17 +404,13 @@ const deleteOtherImages = async (req, res) => {
         const product = await ProductModel.findById(product_id);
 
         if (!product) {
-            return res.send(
-                message.general_error("product not found")
-            );
+            return res.send(message.general_error("product not found"));
         }
 
         const images = product.other_images || [];
 
         if (!images[idx]) {
-            return res.send(
-                message.general_error("image not found")
-            );
+            return res.send(message.general_error("image not found"));
         }
 
         const filePath = path.join(
@@ -480,7 +426,6 @@ const deleteOtherImages = async (req, res) => {
         images.splice(idx, 1);
 
         product.other_images = images;
-
         await product.save();
 
         res.send({
@@ -490,13 +435,9 @@ const deleteOtherImages = async (req, res) => {
         });
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 
@@ -506,23 +447,17 @@ const updateProduct = async (req, res) => {
     try {
 
         const { id } = req.params;
-
         const data = req.body;
-
         const image = req.files?.image;
 
         const product = await ProductModel.findById(id);
 
         if (!product) {
-            return res.send(
-                message.general_error("product not found")
-            );
+            return res.send(message.general_error("product not found"));
         }
 
-        // duplicate check
         const duplicate = await ProductModel.findOne({
             _id: { $ne: id },
-
             $or: [
                 { name: data.name },
                 { slug: data.slug },
@@ -531,14 +466,9 @@ const updateProduct = async (req, res) => {
         });
 
         if (duplicate) {
-            return res.send(
-                message.general_error(
-                    "name, slug or sku already exists"
-                )
-            );
+            return res.send(message.general_error("name, slug or sku already exists"));
         }
 
-        // update image
         if (image) {
 
             const oldPath = path.join(
@@ -562,60 +492,28 @@ const updateProduct = async (req, res) => {
             await image.mv(destination);
 
             product.image_name = imageName;
-
         }
 
-        // update fields
         product.sku_id = data.sku_id;
-
         product.name = data.name;
-
         product.slug = data.slug;
-
-        product.original_price = Number(
-            data.original_price
-        );
-
-        product.discounted_price = Number(
-            data.discounted_price
-        );
-
-        product.discount_percentage = Number(
-            data.discount_percentage || 0
-        );
-
+        product.original_price = Number(data.original_price);
+        product.discounted_price = Number(data.discounted_price);
+        product.discount_percentage = Number(data.discount_percentage || 0);
         product.description = data.description;
-
-
-        product.short_description =
-            data.short_description ||
-            "";
-
-        product.stock = Number(
-            data.stock || 0
-        );
-
-
+        product.short_description = data.short_description || "";
+        product.stock = Number(data.stock || 0);
         product.brand_id = data.brand_id || null;
-
-        product.color_ids = data.color_ids
-            ? JSON.parse(data.color_ids)
-            : [];
+        product.color_ids = data.color_ids ? JSON.parse(data.color_ids) : [];
 
         await product.save();
 
-        res.send(
-            message.general_success("product updated")
-        );
+        res.send(message.general_success("product updated"));
 
     } catch (error) {
-
         console.log(error);
-
         res.send(message.catch_error);
-
     }
-
 };
 
 

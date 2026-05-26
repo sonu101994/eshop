@@ -215,10 +215,10 @@ export default function AddProductPage() {
     
         return (
 
-        <div className="space-y-6 mt-4 px-3 sm:px-5 lg:px-0">
+        <div className="admin-page space-y-6">
 
             {/* header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="admin-page-header">
 
                 <div>
 
@@ -260,7 +260,7 @@ export default function AddProductPage() {
             </div>
 
             {/* form */}
-            <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+            <div className="admin-panel-card p-4 sm:p-6">
 
                 <form
                     onSubmit={submitHandler}
@@ -287,7 +287,7 @@ export default function AddProductPage() {
                             ref={nameRef}
                             onChange={nameChangeHandler}
                             placeholder="Enter product name"
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                         />
 
                     </div>
@@ -331,7 +331,7 @@ export default function AddProductPage() {
                                 type="text"
                                 ref={skuRef}
                                 placeholder="Enter sku id"
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black"
+                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                             />
 
                         </div>
@@ -357,7 +357,7 @@ export default function AddProductPage() {
                                 ref={originalPriceRef}
                                 onChange={calculateDiscount}
                                 placeholder="Enter original price"
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black"
+                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                             />
 
                         </div>
@@ -378,7 +378,7 @@ export default function AddProductPage() {
                                 ref={discountedPriceRef}
                                 onChange={calculateDiscount}
                                 placeholder="Enter discounted price"
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black"
+                                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                             />
 
                         </div>
@@ -419,7 +419,7 @@ export default function AddProductPage() {
                         <select
                             value={brandId}
                             onChange={(e) => setBrandId(e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                         >
 
                             <option value="">
@@ -465,7 +465,7 @@ export default function AddProductPage() {
                                     className={`px-4 py-2 rounded-lg border text-sm transition-all
                                         
                                     ${selectedColors.includes(color._id)
-                                            ? "bg-black text-white border-black"
+                                            ? "bg-slate-950 text-white border-slate-950"
                                             : "bg-white text-gray-700 border-gray-300"
                                         }`}
                                 >
@@ -495,7 +495,7 @@ export default function AddProductPage() {
                             rows={5}
                             ref={descriptionRef}
                             placeholder="Enter product description"
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10 resize-none"
                         />
 
                     </div>
@@ -523,7 +523,7 @@ export default function AddProductPage() {
 
                         <label
                             htmlFor="image"
-                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer rounded-lg border border-gray-300 px-4 py-3 hover:border-black"
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer rounded-lg border border-gray-300 px-4 py-3 hover:border-slate-900"
                         >
 
                             <div className="flex items-center gap-3 overflow-hidden">
@@ -619,7 +619,7 @@ export default function AddProductPage() {
 
                         <button
                             type="submit"
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-black px-6 py-2.5 text-white hover:bg-gray-800"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-6 py-2.5 text-white hover:bg-slate-800"
                         >
 
                             <svg

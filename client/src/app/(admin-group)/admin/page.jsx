@@ -1,206 +1,190 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiClient, getAuthHeader } from "@/library/helper";
 import { toast } from "react-toastify";
 
-export default function adminDashBoard() {
+const currency = (value = 0) =>
+    new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+    }).format(Number(value || 0));
 
+const number = (value = 0) => new Intl.NumberFormat("en-IN").format(Number(value || 0));
+
+const statusClass = (status) => {
+    switch (String(status || "").toLowerCase()) {
+        case "pending":
+            return "border-amber-200 bg-amber-50 text-amber-700";
+        case "received":
+        case "confirmed":
+            return "border-blue-200 bg-blue-50 text-blue-700";
+        case "processing":
+            return "border-violet-200 bg-violet-50 text-violet-700";
+        case "delivered":
+            return "border-emerald-200 bg-emerald-50 text-emerald-700";
+        case "cancelled":
+            return "border-slate-200 bg-slate-100 text-slate-500";
+        default:
+            return "border-slate-200 bg-slate-50 text-slate-600";
+    }
+};
+
+const formatDate = (date) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+};
+
+function StatCard({ title, value, href, tone = "slate" }) {
+    const tones = {
+        slate: "from-slate-50 to-slate-100",
+        blue: "from-sky-50 to-blue-100",
+        amber: "from-amber-50 to-orange-100",
+        emerald: "from-emerald-50 to-teal-100",
+        violet: "from-violet-50 to-indigo-100",
+        rose: "from-rose-50 to-pink-100",
+    };
+
+    const card = (
+        <div className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br ${tones[tone] || tones.slate} p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}>
+            <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-white/45" />
+            <p className="relative text-sm font-bold text-slate-600">{title}</p>
+            <h2 className="relative mt-3 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{value}</h2>
+        </div>
+    );
+
+    return href ? <Link href={href}>{card}</Link> : card;
+}
+
+export default function AdminDashBoard() {
     const [stats, setStats] = useState(null);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // fetching dashboard details
+
     const fetchDashBoard = async () => {
         try {
-            const response = await apiClient.get(
-                "/dashboard",
-                getAuthHeader()
-            );
+            const response = await apiClient.get("/dashboard", getAuthHeader());
 
             if (response.data.flag == 1) {
-                setStats(response.data.data.stats);
+                setStats(response.data.data.stats || {});
                 setOrders(response.data.data.recentOrders || []);
+            } else {
+                toast.error(response.data.msg || "Dashboard data not found");
             }
         } catch (error) {
             console.log(error);
             toast.error("dashboard data not found");
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-
         fetchDashBoard();
     }, []);
-        // card to show data
-    const Card = ({ title, value, color }) => {
-        return (
-            <div className={`p-5 rounded-2xl shadow-md text-white ${color}`}>
-                <p className="text-sm opacity-80">{title}</p>
-                <h2 className="text-2xl font-bold mt-2">
-                    {value || 0}
-                </h2>
-            </div>
-        );
-    };
-        // status color set function
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "pending":
-                return "bg-yellow-100 text-yellow-700";
-            case "completed":
-                return "bg-green-100 text-green-700";
-            case "cancelled":
-                return "bg-red-100 text-red-700";
-            default:
-                return "bg-gray-100 text-gray-700";
-        }
-    };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 sm:p-6 text-gray-700">
-
-            {/* header */}
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Dashboard
-                </h1>
-                <p className="text-gray-500">
-                    Welcome back, here is your business overview
-                </p>
+        <div className="admin-page space-y-6">
+            <div className="admin-page-header">
+                <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Overview</p>
+                    <h1 className="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Dashboard</h1>
+                    <p className="mt-1 text-sm text-slate-500">Clean summary of sales, orders, products and customers.</p>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                    <Link href="/admin/product/add" className="admin-primary-btn">Add Product</Link>
+                    <Link href="/" className="admin-secondary-btn">Go to website</Link>
+                </div>
             </div>
 
-            {/* loading */}
             {loading ? (
-                <div className="h-40 flex items-center justify-center text-gray-500">
-                    Loading dashboard...
-                </div>
+                <div className="admin-panel-card flex h-44 items-center justify-center text-slate-500">Loading dashboard...</div>
             ) : (
                 <>
-                    {/* stats grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-                        <Card
-                            title="Total Orders"
-                            value={stats?.totalOrders}
-                            color="bg-gradient-to-r from-blue-500 to-blue-700"
-                        />
-
-                        <Card
-                            title="Products"
-                            value={stats?.totalProducts}
-                            color="bg-gradient-to-r from-purple-500 to-purple-700"
-                        />
-
-                        <Card
-                            title="Customers"
-                            value={stats?.totalCustomers}
-                            color="bg-gradient-to-r from-green-500 to-green-700"
-                        />
-
-                        <Card
-                            title="Revenue"
-                            value={`₹${stats?.totalRevenue || 0}`}
-                            color="bg-gradient-to-r from-orange-500 to-orange-700"
-                        />
-
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                        <StatCard title="Total Revenue" value={currency(stats?.totalRevenue)} href="/admin/order" tone="slate" />
+                        <StatCard title="Total Orders" value={number(stats?.totalOrders)} href="/admin/order" tone="blue" />
+                        <StatCard title="Total Products" value={number(stats?.totalProducts)} href="/admin/product" tone="emerald" />
+                        <StatCard title="Customers" value={number(stats?.totalCustomers)} href="/admin/users" tone="violet" />
                     </div>
 
-                    {/* recent orders */}
-                    <div className="mt-10 mb-3">
-                        <h2 className="text-xl font-bold text-gray-900">
-                            Recent Orders
-                        </h2>
-                        <p className="text-sm text-gray-500">
-                            Latest customer activity
-                        </p>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                        <StatCard title="Pending Orders" value={number(stats?.pendingOrders)} href="/admin/order" tone="amber" />
+                        <StatCard title="Received Orders" value={number(stats?.receivedOrders)} href="/admin/order" tone="blue" />
+                        <StatCard title="Processing Orders" value={number(stats?.processingOrders)} href="/admin/order" tone="violet" />
+                        <StatCard title="Delivered Orders" value={number(stats?.deliveredOrders)} href="/admin/order" tone="emerald" />
                     </div>
 
-                    {/* table */}
-                    <div className="hidden md:block bg-white rounded-2xl shadow overflow-hidden text-gray-700">
-
-                        <table className="w-full">
-
-                            <thead className="bg-gray-100 text-gray-700">
-                                <tr>
-                                    <th className="p-4 text-left">Order ID</th>
-                                    <th className="p-4 text-left">Amount</th>
-                                    <th className="p-4 text-left">Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                {orders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="p-6 text-center text-gray-500">
-                                            No orders found
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    orders.map((o) => (
-                                        <tr key={o._id} className="border-t hover:bg-gray-50">
-
-                                            <td className="p-4 font-medium text-gray-700">
-                                                {o._id}
-                                            </td>
-
-                                            <td className="p-4">
-                                                ₹{o.total_amount}
-                                            </td>
-
-                                            <td className="p-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(o.status)}`}>
-                                                    {o.status}
-                                                </span>
-                                            </td>
-
-                                        </tr>
-                                    ))
-                                )}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                    {/* mobile */}
-                    <div className="md:hidden space-y-3 mt-4">
-
-                        {orders.length === 0 ? (
-                            <div className="text-center text-gray-500">
-                                No orders found
+                    <div className="admin-panel-card overflow-hidden">
+                        <div className="flex flex-col gap-2 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-950">Recent orders</h2>
+                                <p className="mt-1 text-sm text-slate-500">Last 5 orders from customers.</p>
                             </div>
-                        ) : (
-                            orders.map((o) => (
-                                <div key={o._id} className="bg-white p-4 rounded-xl shadow">
+                            <Link href="/admin/order" className="admin-secondary-btn w-full sm:w-auto">View all orders</Link>
+                        </div>
 
-                                    <p className="font-semibold text-gray-900">
-                                        #{o._id}
-                                    </p>
+                        <div className="hidden md:block">
+                            <table className="admin-table min-w-full">
+                                <thead>
+                                    <tr>
+                                        {['Order', 'Customer', 'Date', 'Amount', 'Status', 'Payment'].map((head) => <th key={head}>{head}</th>)}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {orders.map((order) => (
+                                        <tr key={order._id}>
+                                            <td className="font-bold text-slate-900">#{String(order._id).slice(-6)}</td>
+                                            <td>
+                                                <p className="font-semibold text-slate-900">{order.user_id?.name || "Customer"}</p>
+                                                <p className="text-xs text-slate-500">{order.user_id?.email || "No email"}</p>
+                                            </td>
+                                            <td className="text-slate-600">{formatDate(order.createdAt)}</td>
+                                            <td className="font-semibold text-slate-900">{currency(order.total_amount)}</td>
+                                            <td><span className={`admin-status-pill ${statusClass(order.status)}`}>{order.status || "Pending"}</span></td>
+                                            <td><span className="admin-status-pill">{order.payment_method || "COD"}</span></td>
+                                        </tr>
+                                    ))}
+                                    {orders.length === 0 && (
+                                        <tr><td colSpan="6" className="py-10 text-center text-slate-500">No recent orders found.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                                    <p className="text-sm text-gray-600 mt-1">
-                                        ₹{o.total_amount}
-                                    </p>
-
-                                    <span className={`inline-block mt-2 text-xs px-2 py-1 rounded ${getStatusColor(o.status)}`}>
-                                        {o.status}
-                                    </span>
-
+                        <div className="grid gap-4 p-4 md:hidden">
+                            {orders.map((order) => (
+                                <div key={order._id} className="rounded-2xl border border-slate-200 bg-white p-4">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <h3 className="font-bold text-slate-950">#{String(order._id).slice(-6)}</h3>
+                                            <p className="mt-1 text-sm text-slate-500">{order.user_id?.name || "Customer"}</p>
+                                        </div>
+                                        <span className={`admin-status-pill ${statusClass(order.status)}`}>{order.status || "Pending"}</span>
+                                    </div>
+                                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                                        <div className="admin-soft-card p-3">
+                                            <p className="text-xs font-semibold text-slate-500">Amount</p>
+                                            <p className="mt-1 font-bold text-slate-950">{currency(order.total_amount)}</p>
+                                        </div>
+                                        <div className="admin-soft-card p-3">
+                                            <p className="text-xs font-semibold text-slate-500">Payment</p>
+                                            <p className="mt-1 font-bold text-slate-950">{order.payment_method || "COD"}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            ))
-                        )}
-
+                            ))}
+                            {orders.length === 0 && <div className="rounded-2xl bg-slate-50 p-5 text-center text-sm text-slate-500">No recent orders found.</div>}
+                        </div>
                     </div>
-
                 </>
             )}
-
         </div>
     );
-
 }

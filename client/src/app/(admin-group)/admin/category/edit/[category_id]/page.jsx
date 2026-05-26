@@ -130,10 +130,10 @@ export default function EditCategoryPage() {
 
   return (
 
-    <div className="space-y-6 mt-4 px-3 sm:px-5 lg:px-0">
+    <div className="admin-page space-y-6">
 
       {/* header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="admin-page-header">
 
         <div>
 
@@ -173,7 +173,7 @@ export default function EditCategoryPage() {
       </div>
 
       {/* form */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div className="admin-panel-card p-4 sm:p-6">
 
         <form
           onSubmit={submitHandler}
@@ -199,7 +199,7 @@ export default function EditCategoryPage() {
               onChange={nameChangeHandler}
               name="name"
               placeholder="e.g., Electronics, Clothing, Books"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
             />
 
           </div>
@@ -267,7 +267,7 @@ export default function EditCategoryPage() {
               {/* upload here */}
               <label
                 htmlFor="image"
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer rounded-lg border border-gray-300 px-4 py-3 hover:border-blue-500"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer rounded-lg border border-gray-300 px-4 py-3 hover:border-slate-900"
               >
 
                 <div className="flex items-center gap-3 overflow-hidden">
@@ -361,7 +361,7 @@ export default function EditCategoryPage() {
 
             <button
               type="submit"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-white hover:bg-blue-700"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-6 py-2.5 text-white hover:bg-slate-800"
             >
 
               <svg

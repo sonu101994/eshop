@@ -2,7 +2,7 @@
 const express=require("express");
 const OrderRouter=express.Router();
 const AuthUser=require("../middleware/AuthUser");
-const AuthAdmin=require("../middleware/AUthAdmin");
+const AuthAdmin=require("../middleware/AuthAdmin");
 
 const {createOrder,getMyOrders,getOrderById,getAllOrders,updateOrderStatus,cancelOrder}=require("../controllers/OrderController");
 

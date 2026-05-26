@@ -55,13 +55,13 @@ export default function AdminListingPage(){
     };
 
       return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 text-gray-700">
+        <div className="admin-page space-y-6">
 
             {/* HEADER */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="admin-page-header">
 
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">
+                    <h1 className="text-2xl font-bold text-slate-950 sm:text-3xl">
                         Admins
                     </h1>
                     <p className="text-sm text-gray-500">
@@ -72,7 +72,7 @@ export default function AdminListingPage(){
                 {/* ADD BUTTON */}
                 <Link
                     href="/admin/admin-listing/add"
-                    className="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition"
+                    className="inline-flex rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
                     + Add Admin
                 </Link>
@@ -80,7 +80,7 @@ export default function AdminListingPage(){
             </div>
 
             {/* DESKTOP TABLE */}
-            <div className="hidden md:block bg-white rounded-2xl shadow border overflow-hidden">
+            <div className="admin-panel-card hidden overflow-hidden md:block">
 
                 {loading ? (
                     <div className="p-10 text-center">Loading...</div>
@@ -92,7 +92,7 @@ export default function AdminListingPage(){
 
                     <table className="w-full">
 
-                        <thead className="bg-gray-100">
+                        <thead className="bg-slate-50">
                             <tr>
                                 <th className="p-3 text-left">Name</th>
                                 <th className="p-3 text-left">Email</th>
@@ -104,7 +104,7 @@ export default function AdminListingPage(){
 
                         <tbody>
                             {admins.map((admin) => (
-                                <tr key={admin._id} className="border-b hover:bg-gray-50">
+                                <tr key={admin._id} className="border-b border-slate-100 hover:bg-slate-50/70">
 
                                     <td className="p-3 font-medium">
                                         {admin.name}
@@ -123,8 +123,8 @@ export default function AdminListingPage(){
                                     <td className="p-3">
                                         <span className={`px-2 py-1 text-xs rounded ${
                                             admin.status
-                                                ? "bg-green-100 text-green-600"
-                                                : "bg-red-100 text-red-600"
+                                                ? "bg-slate-900 text-white"
+                                                : "bg-slate-100 text-slate-600"
                                         }`}>
                                             {admin.status ? "Active" : "Inactive"}
                                         </span>
@@ -135,7 +135,7 @@ export default function AdminListingPage(){
                                         {/* EDIT */}
                                         <Link
                                             href={`/admin/admin-listing/edit/${admin._id}`}
-                                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                         >
                                             Edit
                                         </Link>
@@ -143,7 +143,7 @@ export default function AdminListingPage(){
                                         {/* TOGGLE */}
                                         <button
                                             onClick={() => updateStatus(admin._id)}
-                                            className="bg-black text-white px-3 py-1 rounded text-sm"
+                                            className="rounded-lg bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-800"
                                         >
                                             Toggle
                                         </button>
@@ -174,7 +174,7 @@ export default function AdminListingPage(){
                     admins.map((admin) => (
                         <div
                             key={admin._id}
-                            className="bg-white border rounded-xl p-4 shadow-sm"
+                            className="admin-panel-card p-4"
                         >
 
                             <div className="font-semibold text-gray-800">
@@ -193,8 +193,8 @@ export default function AdminListingPage(){
 
                                 <span className={`text-xs px-2 py-1 rounded ${
                                     admin.status
-                                        ? "bg-green-100 text-green-600"
-                                        : "bg-red-100 text-red-600"
+                                        ? "bg-slate-900 text-white"
+                                        : "bg-slate-100 text-slate-600"
                                 }`}>
                                     {admin.status ? "Active" : "Inactive"}
                                 </span>
@@ -205,14 +205,14 @@ export default function AdminListingPage(){
 
                                 <Link
                                     href={`/admin/admin-listing/edit/${admin._id}`}
-                                    className="flex-1 bg-blue-600 text-white text-center py-2 rounded"
+                                    className="flex-1 rounded-lg border border-slate-200 py-2 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                 >
                                     Edit
                                 </Link>
 
                                 <button
                                     onClick={() => updateStatus(admin._id)}
-                                    className="flex-1 bg-black text-white py-2 rounded"
+                                    className="flex-1 rounded-lg bg-slate-950 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                                 >
                                     Toggle
                                 </button>

@@ -30,7 +30,7 @@ export default function MultipleImage(
                     setOtherImages(response.data.current_other_images);
                 }
             }
-        ).catch(() => {
+        ).catch((error) => {
             console.log(error);
             toast.error(
                 error?.response?.data?.msg || "Something went wrong"
@@ -64,7 +64,7 @@ console.log("FILES:", images);
                     console.log("hii");
                 }
             }
-        ).catch(() => {
+        ).catch((error) => {
             console.log(error);
             toast.error(
                 error?.response?.data?.msg || "Something went wrong"
@@ -78,7 +78,7 @@ console.log("FILES:", images);
     return (
         <div>
             {/* open modal button */}
-            <button onClick={() => setToggle(true)} className="p-2 hover:bg-gray-100 rounded-lg transition">
+            <button onClick={() => setToggle(true)} className="admin-icon-btn">
                 <RiGalleryFill size={18} />
             </button>
 

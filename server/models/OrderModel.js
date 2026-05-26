@@ -1,54 +1,105 @@
 const mongoose = require("mongoose");
-const OrderSchema = new mongoose.Schema({
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+// shipping address
+const ShippingAddressSchema = new mongoose.Schema(
+    {
+        name: String,
+        mobile: String,
+        pincode: String,
+        address: String,
+        locality: String,
+        city: String,
+        state: String,
+        landmark: String,
+        address_type: String,
     },
+    { _id: false }
+);
 
-    products: [
-        {
-            product_id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Product",
+const OrderSchema = new mongoose.Schema(
+    {
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+
+        address_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Address",
+            default: null,
+        },
+
+        shipping_address: {
+            type: ShippingAddressSchema,
+            default: null,
+        },
+
+        products: [
+            {
+                product_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Product",
+                },
+
+                name: String,
+                sku_id: String,
+                qty: {
+                    type: Number,
+                    default: 1,
+                },
+
+                original_price: Number,
+                discounted_price: Number,
+                discount_percentage: Number,
+
+                final_price: Number,
+
+                color_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Color",
+                    default: null,
+                },
+                color_name: String,
+                color_code: String,
+
+                image: String,
             },
+        ],
 
-            name: String,
-            sku_id: String,
-            qty: {
-                type: Number,
-                default: 1
-            },
+        subtotal: {
+            type: Number,
+            default: 0,
+        },
+        discount_total: {
+            type: Number,
+            default: 0,
+        },
+        total_amount: {
+            type: Number,
+            default: 0,
+        },
 
-            original_price: Number,
-            discounted_price: Number,
-            discount_percentage: Number,
+        status: {
+            type: String,
+            default: "Pending",
+        },
 
-            final_price: Number,
+        payment_method: {
+            type: String,
+            default: "COD",
+        },
 
-            image: String
-        }
-    ],
-    subtotal: Number,
-    discount_total: Number,
-    total_amount: Number,
+        payment_status: {
+            type: String,
+            default: "Pending",
+        },
 
-    status: {
-        type: String,
-        default: "Pending"
+        razorpay_order_id: String,
+        razorpay_payment_id: String,
+        razorpay_signature: String,
     },
-
-    payment_method: {
-        type: String,
-        default: "COD"
-    },
-
-    payment_status: {
-        type: String,
-        default: "Pending"
-    }
-
-}, { timestamps: true });
+    { timestamps: true }
+);
 
 const OrderModel = mongoose.model("Order", OrderSchema);
 

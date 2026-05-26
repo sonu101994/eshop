@@ -1,11 +1,13 @@
 const CategoryModel=require("../models/CategoryModel");
+const BrandModel = require("../models/BrandModel");
+const ProductModel = require("../models/ProductModel");
 const { generateRandomNames, message } = require("../library/helper");
 const path = require("path");
 const fs = require("fs");
 
 
 
-// getData function  to give response if receive get request from client
+// getCATEGORIES function  to give response if receive get request from client
 const getCategories = async (req, res) => {
     try {
         const query = req.query; /* extracting query */
@@ -42,7 +44,7 @@ const getCategories = async (req, res) => {
                 "true";
         }
 
-
+// ***search query****
         if (query.search) {
 
             filter.name = {
@@ -50,15 +52,40 @@ const getCategories = async (req, res) => {
                 $options: "i",
             };
         }
-        console.log(filter);
+        // console.log(filter);
 
-        const categories = await CategoryModel.find(filter).sort({ createdAt: -1 });
+        const categories = await CategoryModel.find(filter).sort({ createdAt: -1 }).lean();
+
+        // Products are connected to categories through Brand.category_ids.
+        // So category product count is calculated from products whose brand belongs to that category.
+        const categoryIds = categories.map((category) => category._id);
+        const brands = categoryIds.length
+            ? await BrandModel.find({ category_ids: { $in: categoryIds } }).select("_id category_ids").lean()
+            : [];
+
+        const categoriesWithCount = await Promise.all(
+            categories.map(async (category) => {
+                const brandIds = brands
+                    .filter((brand) => (brand.category_ids || []).some((catId) => String(catId) === String(category._id)))
+                    .map((brand) => brand._id);
+
+                const product_count = brandIds.length
+                    ? await ProductModel.countDocuments({ brand_id: { $in: brandIds } })
+                    : 0;
+
+                return {
+                    ...category,
+                    product_count,
+                };
+            })
+        );
+
         // Get or read operation
         res.send(
             {
-                count: Array.isArray(categories) && categories.length,
+                count: Array.isArray(categoriesWithCount) && categoriesWithCount.length,
                 flag: 1, //success
-                categories,
+                categories: categoriesWithCount,
                 image_path: "/images/categories/",
             }
         )

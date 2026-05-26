@@ -1,7 +1,7 @@
 "use client";
 
 import { getBrand, getColors, getProduct } from "@/library/api-call";
-import { apiClient, titleToSlug,getAuthHeader } from "@/library/helper";
+import { apiClient, titleToSlug, getAuthHeader, buildImageUrl } from "@/library/helper";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -250,10 +250,10 @@ export default function EditProductPage() {
 
   return (
 
-    <div className="space-y-6 mt-4 px-3 sm:px-5 lg:px-0">
+    <div className="admin-page space-y-6">
 
       {/* header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="admin-page-header">
 
         <div>
 
@@ -279,7 +279,7 @@ export default function EditProductPage() {
       </div>
 
       {/* form */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div className="admin-panel-card p-4 sm:p-6">
 
         <form
           onSubmit={submitHandler}
@@ -459,7 +459,7 @@ export default function EditProductPage() {
               </p>
 
               <img
-                src={`${process.env.NEXT_PUBLIC_ASSET_PATH}${data?.imageUrl}/main_images/${data?.product?.image_name}`}
+                src={buildImageUrl(data?.imageUrl, data?.product?.image_name)}
                 alt="product"
                 className="h-28 w-28 rounded-lg border border-gray-200 object-cover"
               />
@@ -494,7 +494,7 @@ export default function EditProductPage() {
           {/* submit */}
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-6 py-2.5 text-white hover:bg-blue-700"
+            className="rounded-lg bg-slate-950 px-6 py-2.5 text-white hover:bg-slate-800"
           >
 
             Update Product

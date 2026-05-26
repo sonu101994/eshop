@@ -3,7 +3,7 @@ const { generateRandomNames,message } = require("../library/helper");
 const BrandModel=require("../models/BrandModel");
 const fs = require("fs");
 
-// get data function 
+// get brands function 
 const getBrands = async (req, res) => {
     try {
         const query = req.query;
