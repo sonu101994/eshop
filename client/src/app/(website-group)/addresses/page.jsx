@@ -1,11 +1,11 @@
 "use client";
 
+import { addAddress, deleteAddress, getAddresses, updateAddress } from "@/library/api-call";
+import { Home, MapPin, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { Home, MapPin, Plus, Trash2 } from "lucide-react";
-import { addAddress, deleteAddress, getAddresses, updateAddress } from "@/library/api-call";
 
 // blank address shape 
 const emptyAddress = {
@@ -243,7 +243,7 @@ export default function AddressesPage() {
                                         disabled={busyId === address._id}
                                         className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-rose-200 hover:text-rose-600 disabled:opacity-60"
                                     >
-                                        <Trash2 size={13} /> Delete
+                                        <Trash2 size={14} /> Delete
                                     </button>
                                 </div>
                             </div>
