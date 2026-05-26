@@ -71,11 +71,13 @@ export default function Header() {
                             Wishlist
                         </Link>
                         {/* admin token available==>>admin panel*/}
-                        {adminToken && (
+                        {adminToken? (
                             <Link href="/admin" className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-200">
                                 Admin
                             </Link>
-                        )}
+                        ): <Link href="/admin/login" className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-200">
+                                Admin Login
+                            </Link>}
                     </nav>
 
                     <div className="flex items-center gap-3">

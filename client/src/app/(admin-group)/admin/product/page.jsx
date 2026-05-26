@@ -9,12 +9,7 @@ import { FiPlus } from "react-icons/fi";
 
 const money = (value = 0) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
-const stockLabel = (stock = 0) => {
-    const count = Number(stock || 0);
-    if (count <= 0) return { text: "Out of stock", cls: "border-slate-200 bg-slate-100 text-slate-500" };
-    if (count <= 5) return { text: `${count} left`, cls: "border-amber-200 bg-amber-50 text-amber-700" };
-    return { text: `${count} in stock`, cls: "border-slate-900 bg-slate-900 text-white" };
-};
+
 
 export default async function ProductPage() {
     const { products, image_path, other_image_path } = await getProduct({ limit: 100 });
@@ -48,7 +43,7 @@ export default async function ProductPage() {
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                {["Product", "Price", "Stock", "Colors", "Brand", "Settings", "Actions"].map((head) => (
+                                {["Product", "Price", "Colors", "Brand", "Settings", "Actions"].map((head) => (
                                     <th key={head}>{head}</th>
                                 ))}
                             </tr>
@@ -56,7 +51,6 @@ export default async function ProductPage() {
 
                         <tbody className="divide-y divide-slate-100">
                             {products.map((prod) => {
-                                const stock = stockLabel(prod.stock);
                                 return (
                                     <tr key={prod._id}>
                                         <td>
@@ -79,9 +73,6 @@ export default async function ProductPage() {
                                             </div>
                                         </td>
 
-                                        <td>
-                                            <span className={`admin-status-pill ${stock.cls}`}>{stock.text}</span>
-                                        </td>
 
                                         <td>
                                             <div className="flex max-w-[220px] flex-wrap gap-1.5">
@@ -123,7 +114,6 @@ export default async function ProductPage() {
 
             <div className="grid gap-4 xl:hidden">
                 {products.map((prod) => {
-                    const stock = stockLabel(prod.stock);
                     return (
                         <div key={prod._id} className="admin-mobile-card">
                             <div className="flex items-start justify-between gap-3">
@@ -151,10 +141,7 @@ export default async function ProductPage() {
                                     <p className="mt-1 font-bold text-slate-950">{money(prod.discounted_price)}</p>
                                     <p className="text-xs text-slate-400 line-through">{money(prod.original_price)}</p>
                                 </div>
-                                <div className="admin-soft-card p-3">
-                                    <p className="text-xs font-semibold text-slate-500">Stock</p>
-                                    <span className={`mt-2 inline-flex ${stock.cls} admin-status-pill`}>{stock.text}</span>
-                                </div>
+                               
                             </div>
 
                             <div className="mt-4">

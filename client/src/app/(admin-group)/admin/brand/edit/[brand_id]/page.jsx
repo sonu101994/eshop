@@ -167,7 +167,7 @@ export default function EditBrandPage() {
 
             const response = await apiClient.put(
                 `/brand/edit/${params.brand_id}`,
-                formData
+                formData,getAuthHeader()
             );
 
             if (response.data.flag == 1) {

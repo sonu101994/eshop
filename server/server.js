@@ -6,9 +6,7 @@ const app=require("./app");
 
 const PORT=process.env.PORT||5000;
 
-mongoose.connect(process.env.MONGODB_URI, {
-    dbName: process.env.DB_NAME,
-}).then(() => {
+mongoose.connect(process.env.MONGODB_URI).then(() => {
     console.log("Database successfully connected!");
 }).catch(() => {
     console.log("Unable to connect DB!")

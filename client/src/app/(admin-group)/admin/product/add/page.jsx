@@ -75,7 +75,7 @@ export default function AddProductPage() {
                 apiClient.get("/color"),
             ]);
 
-            if (brandRes.data.flag) {
+            if (brandRes.data.flag==1) {
                 setBrands(brandRes.data.brands);
             }
             if (colorRes.data.flag == 1) {

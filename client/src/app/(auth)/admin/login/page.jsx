@@ -5,6 +5,8 @@ import { loginAdmin } from "@/redux/reducers/AdminReducers";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { ArrowRight } from "lucide-react";
+import WebsiteLayout from './../../../(website-group)/layout';
 
 
 // admin login page
@@ -120,6 +122,13 @@ export default function AdminLoginPage() {
                         </button>
 
                     </form>
+                
+                        <Link href="/"  className="flex  justify-center align-center gap-2  mt-2 bg-blue-500 text-white font-semibold px-4 py-2 w-full  rounded-lg">
+                                <span>  Go To Website</span>
+                             <ArrowRight size={16} className="self-center" />
+                        </Link>
+                        
+                    
 
                 </div>
 

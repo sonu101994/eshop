@@ -195,7 +195,7 @@ export default function ProductDetailsPage() {
                 <div className="grid gap-8 rounded-2xl border border-slate-200 bg-white p-4 lg:grid-cols-[1fr_1fr] lg:p-6">
                     <div>
                         <div className="overflow-hidden rounded-2xl bg-slate-100">
-                            <img src={selectedImage || gallery[0]} alt={product.name} className="h-[360px] w-full object-cover sm:h-[480px]" />
+                            <img src={selectedImage || gallery[0]} alt={product.name} className="h-[360px] w-full object-contain sm:h-[480px]" />
                         </div>
 
                         {/* product thumbnails */}
@@ -306,13 +306,7 @@ export default function ProductDetailsPage() {
                             </div>
                         </div>
 
-                        {/* product full description */}
-                        {product.description && (
-                            <div className="mt-7 border-t border-slate-200 pt-6">
-                                <h2 className="text-lg font-semibold text-slate-950">Description</h2>
-                                <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">{product.description}</p>
-                            </div>
-                        )}
+                      
                     </div>
                 </div>
             </div>
