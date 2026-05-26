@@ -17,3 +17,11 @@ app.listen(
      () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+// testing api
+app.get("/", (req, res) => {
+    res.json({
+        message: "iShop API is running",
+        status: true,
+    });
+});
